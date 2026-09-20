@@ -21,17 +21,19 @@ drag.OnUpdate = function(position) -- Called until the GuiObject has reached the
 end
 
 wait(5)
-drag:Destroy()
+drag.Destroy()
 ```
 
-GameSettings example
+GameSettings example:
 ```lua
 local GameSettings = require(game.ReplicatedStorage:WaitForChild("GameSettings"))
 
 local savedQualitySettingListener = GameSettings.OnChange("SavedQualityLevel", function(value: Enum.SavedQualitySetting)
 	print("SavedQualitySetting: " .. value.Value)
 end)
+
 wait(5)
-savedQualitySettingListener:Disconnect()
+
+savedQualitySettingListener.Disconnect()
 print("hi, SavedQualitySetting: " .. GameSettings.Get("SavedQualitySetting").Value)
 ```
