@@ -22,7 +22,7 @@ drag.OnUpdate = function(position)
 end
 
 wait(5)
-drag:Destroy()
+drag.Destroy()
 ]]
 
 local Draggable = {}
