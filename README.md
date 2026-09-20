@@ -1,4 +1,4 @@
-Dragging (https://create.roblox.com/store/asset/78228119243178) Example:
+Dragging (https://create.roblox.com/store/asset/78228119243178) example:
 ```lua
 local Draggable = require(game.ReplicatedStorage.Draggable)
 local drag = Draggable.new(GUI)
