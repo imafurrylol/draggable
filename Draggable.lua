@@ -138,6 +138,8 @@ function Draggable.new(frame, options)
 		return self.Frame
 	end
 
+	self.Positions["cx"] = self.Frame.Position.X.Offset
+	self.Positions["cy"] = self.Frame.Position.Y.Offset
 	self.Positions["fx"] = self.Frame.Position.X.Offset
 	self.Positions["fy"] = self.Frame.Position.Y.Offset
 
