@@ -146,13 +146,21 @@ function Draggable.new(frame, options)
 			self.Positions["cx"] = self.Positions["x"] - self.Positions["sx"]
 			self.Positions["cy"] = self.Positions["y"] - self.Positions["sy"]
 		end
-
+		
+		local oldFx = self.Positions["fx"]
+		local oldFy = self.Positions["fy"]
 		self.Positions["fx"] = smooth(self.Positions["fx"], self.Positions["cx"], self.Options, deltaTime)
 		self.Positions["fy"] = smooth(self.Positions["fy"], self.Positions["cy"], self.Options, deltaTime)
 		self.Frame.Position = UDim2.new(self.Frame.Position.X.Scale, self.Positions["fx"], self.Frame.Position.Y.Scale, self.Positions["fy"])
 
-		if math.abs(self.Positions["fx"] - self.Positions["cx"]) > 1 or math.abs(self.Positions["fy"] - self.Positions["cy"]) > 1 then
-			self.OnUpdate(self.Frame.Position)
+		if self.Options.Smooth then
+			if math.abs(self.Positions["fx"] - self.Positions["cx"]) > 1 or math.abs(self.Positions["fy"] - self.Positions["cy"]) > 1 then
+				self.OnUpdate(self.Frame.Position)
+			end
+		else
+			if oldFx ~= self.Positions["fx"] or oldFy ~= self.Positions["fy"] then
+				self.OnUpdate(self.Frame.Position)
+			end
 		end
 	end
 
