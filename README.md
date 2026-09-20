@@ -1,7 +1,4 @@
-For adding dragging to Frames/GuiObjects without DragDetector.
-Not the cleanest code but it works and is better than most UI drag scripts available on the Toolbox/Creator Store.
-
-Example:
+Dragging (https://create.roblox.com/store/asset/78228119243178) Example:
 ```lua
 local Draggable = require(game.ReplicatedStorage.Draggable)
 local drag = Draggable.new(GUI)
