@@ -1,4 +1,4 @@
-<h6>if you find a bug with something please create an [issue](https://github.com/imafurrylol/roblox/issues/new) :)</h6>
+if you find a bug with something please create an [issue](https://github.com/imafurrylol/roblox/issues/new) :)
 
 [Draggable](https://create.roblox.com/store/asset/78228119243178) (UI drag) example:
 ```lua
@@ -25,9 +25,8 @@ end
 wait(5)
 drag.Destroy()
 ```
-
-<h6>-----</h6>
-
+<br>
+<br>
 [GameSettings](https://github.com/imafurrylol/roblox/blob/main/GameSettings.lua) example:
 ```lua
 local GameSettings = require(game.ReplicatedStorage:WaitForChild("GameSettings"))
@@ -41,9 +40,8 @@ wait(5)
 savedQualitySettingListener.Disconnect()
 print("hi, SavedQualitySetting: " .. GameSettings.Get("SavedQualitySetting").Value)
 ```
-
-<h6>-----</h6>
-
+<br>
+<br>
 [Animation](https://create.roblox.com/store/asset/74653002513678) example:
 ```lua
 local BaseAnimation = game.ReplicatedStorage:WaitForChild("Animation")
