@@ -1,4 +1,4 @@
-All easing modules should be parented to Animation.
+All easings should be parented to Animation.
 
 ```
 Animation
