@@ -27,6 +27,7 @@ drag.Destroy()
 ```
 <br>
 <br>
+
 [GameSettings](https://github.com/imafurrylol/roblox/blob/main/GameSettings.lua) example:
 ```lua
 local GameSettings = require(game.ReplicatedStorage:WaitForChild("GameSettings"))
@@ -42,6 +43,7 @@ print("hi, SavedQualitySetting: " .. GameSettings.Get("SavedQualitySetting").Val
 ```
 <br>
 <br>
+
 [Animation](https://create.roblox.com/store/asset/74653002513678) example:
 ```lua
 local BaseAnimation = game.ReplicatedStorage:WaitForChild("Animation")
