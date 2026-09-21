@@ -6,14 +6,14 @@ local activeDrag = nil
 local userInputService = game:GetService("UserInputService")
 local runService = game:GetService("RunService")
 
-local function within(position, instance)
+local function IsWithin(position, instance)
 	local absolutePosition = instance.AbsolutePosition
 	local absoluteSize = instance.AbsoluteSize
 
 	return position.X >= absolutePosition.X and position.X <= absolutePosition.X + absoluteSize.X and position.Y >= absolutePosition.Y and position.Y <= absolutePosition.Y + absoluteSize.Y
 end
 
-local function smooth(from, to, options, dt)
+local function Smooth(from, to, options, dt)
 	if not options.Smooth then
 		return to
 	end
@@ -31,7 +31,7 @@ userInputService.InputBegan:Connect(function(input: InputObject, gameProcessedEv
 	if input.UserInputType ~= Enum.UserInputType.MouseButton1 and input.UserInputType ~= Enum.UserInputType.Touch then return end
 
 	for index, drag in pairs(drags) do
-		if not within(input.Position, drag.GetHandle()) then continue end
+		if not IsWithin(input.Position, drag.GetHandle()) then continue end
 
 		drag.Positions["x"] = input.Position.X
 		drag.Positions["y"] = input.Position.Y
@@ -39,7 +39,7 @@ userInputService.InputBegan:Connect(function(input: InputObject, gameProcessedEv
 		drag.Positions["sy"] = drag.Positions["y"] - drag.Positions["cy"]
 		drag.Dragging = true
 		drag.Input = input
-		drag.StartDragging(drag.Frame.Position)
+		drag.OnStartDragging(drag.Frame.Position)
 		activeDrag = drag
 		break
 	end
@@ -51,7 +51,7 @@ userInputService.InputEnded:Connect(function(input: InputObject, gameProcessedEv
 
 	activeDrag.Dragging = false
 	activeDrag.Input = nil
-	activeDrag.StopDragging(activeDrag.Frame.Position)
+	activeDrag.OnStopDragging(activeDrag.Frame.Position)
 	activeDrag = nil
 end)
 
@@ -69,10 +69,10 @@ runService.Heartbeat:Connect(function(deltaTime)
 	end
 end)
 
-function Draggable.new(frame, options)
+function Draggable.New(frame, options)
 	local self = {
-		StartDragging = function(position) end,
-		StopDragging = function(position) end,
+		OnStartDragging = function(position) end,
+		OnStopDragging = function(position) end,
 		OnUpdate = function(position) end,
 		Update = function(dt) end,
 		Destroy = function() end,
@@ -117,8 +117,8 @@ function Draggable.new(frame, options)
 
 		local oldFx = self.Positions["fx"]
 		local oldFy = self.Positions["fy"]
-		self.Positions["fx"] = smooth(self.Positions["fx"], self.Positions["cx"], self.Options, deltaTime)
-		self.Positions["fy"] = smooth(self.Positions["fy"], self.Positions["cy"], self.Options, deltaTime)
+		self.Positions["fx"] = Smooth(self.Positions["fx"], self.Positions["cx"], self.Options, deltaTime)
+		self.Positions["fy"] = Smooth(self.Positions["fy"], self.Positions["cy"], self.Options, deltaTime)
 		self.Frame.Position = UDim2.new(self.Frame.Position.X.Scale, self.Positions["fx"], self.Frame.Position.Y.Scale, self.Positions["fy"])
 
 		if self.Options.Smooth then
