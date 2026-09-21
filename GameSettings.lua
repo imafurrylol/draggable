@@ -15,7 +15,7 @@ gameSettings.Changed:Connect(function(setting)
 
 	for _, listener in ipairs(settingListeners) do
 		local _success, _error = pcall(listener.Callback, value)
-		if _success then return end
+		if _success then continue end
 
 		warn("listener for " .. setting ..  " errored: " .. _error)
 	end
