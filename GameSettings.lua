@@ -1,6 +1,8 @@
-local gameSettings = UserSettings().GameSettings
+-- created by @xvZiuV9zoZsEqkfWwyWc on Roblox
 local GameSettings = {}
 local listeners = {}
+
+local gameSettings = UserSettings().GameSettings
 
 gameSettings.Changed:Connect(function(setting)
 	local success, value = pcall(function()
@@ -13,24 +15,20 @@ gameSettings.Changed:Connect(function(setting)
 
 	for _, listener in ipairs(settingListeners) do
 		local _success, _error = pcall(listener.Callback, value)
+		if _success then return end
 
-		if not _success then
-			warn("listener for " .. setting ..  " errored: " .. _error)
-		end
+		warn("listener for " .. setting ..  " errored: " .. _error)
 	end
 end)
 
 function GameSettings.Get(name)
-	if name == nil then
-		return gameSettings
-	end
+	if name == nil then return gameSettings end
 
 	local success, value = pcall(function()
 		return gameSettings[name]
 	end)
 
 	if not success then return nil end
-
 	return value
 end	
 
@@ -38,7 +36,10 @@ function GameSettings.OnChange(settingName, callback)
 	local self = {
 		Name = settingName,
 		Callback = callback,
+		Connected = true,
 		Disconnect = function()
+			if not self.Connected then return end
+
 			for i, listener in ipairs(listeners[settingName]) do
 				if listener == self then
 					table.remove(listeners[settingName], i)
@@ -49,6 +50,8 @@ function GameSettings.OnChange(settingName, callback)
 			if #listeners[settingName] == 0 then
 				listeners[settingName] = nil
 			end
+
+			self.Connected = false
 		end
 	}
 
