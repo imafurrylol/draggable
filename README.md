@@ -1,4 +1,4 @@
-Draggable (https://create.roblox.com/store/asset/78228119243178) example:
+[Draggable](https://create.roblox.com/store/asset/78228119243178) (UI drag) example:
 ```lua
 local Draggable = require(game.ReplicatedStorage.Draggable)
 local drag = Draggable.new(script.Parent)
