@@ -29,7 +29,7 @@ UserInputService.InputBegan:Connect(function(Input: InputObject, GameProcessedEv
     if Input.UserInputType ~= Enum.UserInputType.MouseButton1 and Input.UserInputType ~= Enum.UserInputType.Touch then return end
 
     for _, draggable in pairs(Draggables) do
-        f not IsWithin(Input.Position, draggable.GetHandle()) then continue end
+        if not IsWithin(Input.Position, draggable.GetHandle()) then continue end
 
         draggable.Positions["x"] = Input.Position.X
         draggable.Positions["y"] = Input.Position.Y
