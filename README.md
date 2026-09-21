@@ -9,8 +9,8 @@ local drag = Draggable.New(script.Parent)
 -- options:
 -- Smooth: boolean (whether it smooths or not, default is true
 -- Speed: number (higher = faster, lower = slower, default is 0.44)
--- Handle: GuiObject (default is nil, if not specific anywhere on the input GuiObject will start the dragging)
--- example: local drag = Draggable.new(GUI, { Smooth = false, Handle = GUI.handle })
+-- Handle: GuiObject (default is nil, if not set, anywhere on the input GuiObject will start the drag)
+-- example: local drag = Draggable.New(GUI, { Smooth = false, Handle = GUI.handle })
 
 drag.OnStartDragging = function()
 	print("start")
