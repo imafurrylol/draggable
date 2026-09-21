@@ -25,7 +25,9 @@ end
 wait(5)
 drag.Destroy()
 ```
+
 <h6>-----</h6>
+
 GameSettings example:
 ```lua
 local GameSettings = require(game.ReplicatedStorage:WaitForChild("GameSettings"))
@@ -39,7 +41,9 @@ wait(5)
 savedQualitySettingListener.Disconnect()
 print("hi, SavedQualitySetting: " .. GameSettings.Get("SavedQualitySetting").Value)
 ```
+
 <h6>-----</h6>
+
 [Animation](https://create.roblox.com/store/asset/74653002513678) example:
 ```lua
 local BaseAnimation = game.ReplicatedStorage:WaitForChild("Animation")
