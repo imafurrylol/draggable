@@ -2,7 +2,23 @@ All easing modules should be parented to Animation.
 
 ```
 Animation
+├─── EaseInBack
+├─── EaseInBounce
+├─── EaseInCirc
+├─── EaseInCubic
+├─── EaseInExpo
+├─── EaseInQuad
+├─── EaseInQuart
+├─── EaseInQuint
+├─── EaseInSine
+├─── EaseOutBack
+├─── EaseOutBounce
+├─── EaseOutCirc
 ├─── EaseOutCubic
-├─── Lerp
-└─── etc.
+├─── EaseOutExpo
+├─── EaseOutQuad
+├─── EaseOutQuart
+├─── EaseOutQuint
+├─── EaseOutSine
+└─── Lerp
 ```
