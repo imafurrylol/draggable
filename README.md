@@ -1,3 +1,5 @@
+<h6>if you find a bug with something please create an issue :)</h6>
+
 [Draggable](https://create.roblox.com/store/asset/78228119243178) (UI drag) example:
 ```lua
 local Draggable = require(game.ReplicatedStorage.Draggable)
