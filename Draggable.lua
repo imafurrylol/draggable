@@ -1,30 +1,4 @@
---[[
-usage example:
-
-local Draggable = require(game.ReplicatedStorage.Draggable)
-local drag = Draggable.new(GUI)
--- options:
--- Smooth: boolean (whether it smooths or not, default is true
--- Speed: number (higher = faster, lower = slower, default is 0.44)
--- Handle: GuiObject (default is nil, if not specific anywhere on the input GuiObject will start the dragging)
--- example: local drag = Draggable.new(GUI, { Smooth = false, Handle = GUI.handle })
-
-drag.StartDragging = function()
-	print("start")
-end
-
-drag.StopDragging = function()
-	print("stop")
-end
-
-drag.OnUpdate = function(position)
-	print("x: " .. position.X.Offset .. ", y: " .. position.Y.Offset)
-end
-
-wait(5)
-drag.Destroy()
-]]
-
+-- created by @xvZiuV9zoZsEqkfWwyWc on Roblox
 local Draggable = {}
 local drags = {}
 local activeDrag = nil
@@ -100,26 +74,18 @@ function Draggable.new(frame, options)
 		StartDragging = function(position) end,
 		StopDragging = function(position) end,
 		OnUpdate = function(position) end,
-
 		Update = function(dt) end,
 		Destroy = function() end,
 		GetHandle = function() end,
 		Dragging = false,
 		Input = nil,
 		Frame = frame,
-
 		Options = {
 			Smooth = true,
 			Speed = 0.44,
 			Handle = nil
 		},
-
-		Positions = setmetatable({}, {
-			__index = function(self, i)
-				self[i] = 0
-				return 0
-			end,
-		}),
+		Positions = {},
 	}
 
 	if options then
@@ -148,7 +114,7 @@ function Draggable.new(frame, options)
 			self.Positions["cx"] = self.Positions["x"] - self.Positions["sx"]
 			self.Positions["cy"] = self.Positions["y"] - self.Positions["sy"]
 		end
-		
+
 		local oldFx = self.Positions["fx"]
 		local oldFy = self.Positions["fy"]
 		self.Positions["fx"] = smooth(self.Positions["fx"], self.Positions["cx"], self.Options, deltaTime)
@@ -159,10 +125,11 @@ function Draggable.new(frame, options)
 			if math.abs(self.Positions["fx"] - self.Positions["cx"]) > 1 or math.abs(self.Positions["fy"] - self.Positions["cy"]) > 1 then
 				self.OnUpdate(self.Frame.Position)
 			end
-		else
-			if oldFx ~= self.Positions["fx"] or oldFy ~= self.Positions["fy"] then
-				self.OnUpdate(self.Frame.Position)
-			end
+			return
+		end
+
+		if oldFx ~= self.Positions["fx"] or oldFy ~= self.Positions["fy"] then
+			self.OnUpdate(self.Frame.Position)
 		end
 	end
 
