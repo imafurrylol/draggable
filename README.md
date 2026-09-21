@@ -1,7 +1,7 @@
 Draggable (https://create.roblox.com/store/asset/78228119243178) example:
 ```lua
 local Draggable = require(game.ReplicatedStorage.Draggable)
-local drag = Draggable.new(GUI)
+local drag = Draggable.new(script.Parent)
 -- options:
 -- Smooth: boolean (whether it smooths or not, default is true
 -- Speed: number (higher = faster, lower = slower, default is 0.44)
