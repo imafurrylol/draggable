@@ -24,7 +24,7 @@ drag.OnUpdate = function(position) -- Called until the GuiObject has reached the
 	print("x: " .. position.X.Offset .. ", y: " .. position.Y.Offset)
 end
 
-wait(5)
+task.wait(5)
 drag.Destroy()
 ```
 <br>
@@ -39,7 +39,7 @@ local savedQualitySettingListener = GameSettings.OnChange("SavedQualityLevel", f
 	print("SavedQualitySetting: " .. value.Value)
 end)
 
-wait(5)
+task.wait(5)
 
 savedQualitySettingListener.Disconnect()
 print("hi, SavedQualitySetting: " .. GameSettings.Get("SavedQualitySetting").Value)
