@@ -28,7 +28,7 @@ drag.Destroy()
 
 <h6>-----</h6>
 
-GameSettings example:
+[GameSettings](https://github.com/imafurrylol/roblox/blob/main/GameSettings.lua) example:
 ```lua
 local GameSettings = require(game.ReplicatedStorage:WaitForChild("GameSettings"))
 
