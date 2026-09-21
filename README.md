@@ -3,18 +3,18 @@
 [Draggable](https://create.roblox.com/store/asset/78228119243178) (UI drag) example:
 ```lua
 local Draggable = require(game.ReplicatedStorage.Draggable)
-local drag = Draggable.new(script.Parent)
+local drag = Draggable.New(script.Parent)
 -- options:
 -- Smooth: boolean (whether it smooths or not, default is true
 -- Speed: number (higher = faster, lower = slower, default is 0.44)
 -- Handle: GuiObject (default is nil, if not specific anywhere on the input GuiObject will start the dragging)
 -- example: local drag = Draggable.new(GUI, { Smooth = false, Handle = GUI.handle })
 
-drag.StartDragging = function()
+drag.OnStartDragging = function()
 	print("start")
 end
 
-drag.StopDragging = function()
+drag.OnStopDragging = function()
 	print("stop")
 end
 
