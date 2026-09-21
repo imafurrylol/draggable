@@ -32,6 +32,7 @@ drag.Destroy()
 
 [GameSettings](https://github.com/imafurrylol/roblox/blob/main/GameSettings.lua) example:
 ```lua
+-- yes, this is mostly useless, I am just lazy and prefer to write fewer lines of code
 local GameSettings = require(game.ReplicatedStorage:WaitForChild("GameSettings"))
 
 local savedQualitySettingListener = GameSettings.OnChange("SavedQualityLevel", function(value: Enum.SavedQualitySetting)
