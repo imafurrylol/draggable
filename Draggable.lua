@@ -6,14 +6,14 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 local function IsWithin(Position, Inst)
-	local AbsolutePosition = Inst.AbsolutePosition
-	local AbsoluteSize = Inst.AbsoluteSize
-	return Position.X >= AbsolutePosition.X and Position.X <= AbsolutePosition.X + AbsoluteSize.X and Position.Y >= AbsolutePosition.Y and Position.Y <= AbsolutePosition.Y + AbsoluteSize.Y
+    local AbsolutePosition = Inst.AbsolutePosition
+    local AbsoluteSize = Inst.AbsoluteSize
+    return Position.X >= AbsolutePosition.X and Position.X <= AbsolutePosition.X + AbsoluteSize.X and Position.Y >= AbsolutePosition.Y and Position.Y <= AbsolutePosition.Y + AbsoluteSize.Y
 end
 
 local function Smooth(From, To, Options, DeltaTime)
-	if not Options.Smooth then
-		return To
+    if not Options.Smooth then
+        return To
 	end
 
 	local t = math.clamp(Options.Speed, 0, 1)
