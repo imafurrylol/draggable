@@ -3,70 +3,70 @@ local Settings = UserSettings().GameSettings
 local Listeners = {}
 
 Settings.Changed:Connect(function(SettingName)
-	local Success, Value = pcall(function()
-		return Settings[SettingName]
-	end)
+    local Success, Value = pcall(function()
+        return Settings[SettingName]
+    end)
 
-	if not Success then return end
-	local SettingListeners = Listeners[SettingName]
-	if SettingListeners == nil then return end	
+    if not Success then return end
+    local SettingListeners = Listeners[SettingName]
+    if SettingListeners == nil then return end	
 	
-	for i = #SettingListeners, 1, -1 do
-		local Listener = SettingListeners[i]
-		local Success, Err = pcall(Listener.Callback, Value)
-		if Success then continue end
+    for i = #SettingListeners, 1, -1 do
+        local Listener = SettingListeners[i]
+        local Success, Err = pcall(Listener.Callback, Value)
+        if Success then continue end
 		
-		warn("listener for " .. SettingName .. " errored: " .. Err)
-	end
+        warn("listener for " .. SettingName .. " errored: " .. Err)
+    end
 end)
 
 function GameSettings.Get(SettingName)
-	if SettingName == nil then
-		return Settings
-	end
+    if SettingName == nil then
+        return Settings
+    end
 
-	local Success, Value = pcall(function()
-		return Settings[SettingName]
-	end)
+    local Success, Value = pcall(function()
+        return Settings[SettingName]
+    end)
 
-	if not Success then return nil end
-	return Value
+    if not Success then return nil end
+    return Value
 end	
 
 function GameSettings.OnChange(SettingName, Callback)
-	if SettingName == nil or typeof(SettingName) ~= "string" then
-		error("SettingName must be a string")
-	end
+    if SettingName == nil or typeof(SettingName) ~= "string" then
+        error("SettingName must be a string")
+    end
 
-	if Callback == nil or typeof(Callback) ~= "function" then
-		error("Callback must be a function")
-	end
+    if Callback == nil or typeof(Callback) ~= "function" then
+        error("Callback must be a function")
+    end
 
-	local self = {
-		Name = SettingName,
-		Callback = Callback,
-		Connected = true,
-		Disconnect = function()
-			if not self.Connected then return end
+    local self = {
+        Name = SettingName,
+        Callback = Callback,
+        Connected = true,
+        Disconnect = function()
+            if not self.Connected then return end
 
-			for i, listener in ipairs(Listeners[SettingName]) do
-				if listener == self then
-					table.remove(Listeners[SettingName], i)
-					break
-				end
-			end
+            for i, listener in ipairs(Listeners[SettingName]) do
+                if listener == self then
+                    table.remove(Listeners[SettingName], i)
+                    break
+                end
+            end
 
-			if #Listeners[SettingName] == 0 then
-				Listeners[SettingName] = nil
-			end
+            if #Listeners[SettingName] == 0 then
+                Listeners[SettingName] = nil
+            end
 
-			self.Connected = false
-		end
-	}
+            self.Connected = false
+        end
+    }
 
-	Listeners[SettingName] = Listeners[SettingName] or {}
-	table.insert(Listeners[SettingName], self)
-	return self
+    Listeners[SettingName] = Listeners[SettingName] or {}
+    table.insert(Listeners[SettingName], self)
+    return self
 end
 
 return GameSettings
