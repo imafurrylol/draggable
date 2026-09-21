@@ -1,85 +1,83 @@
 -- created by @xvZiuV9zoZsEqkfWwyWc on Roblox
 local Draggable = {}
-local drags = {}
-local activeDrag = nil
+local Draggables = {}
+local ActiveDraggable = nil
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
-local userInputService = game:GetService("UserInputService")
-local runService = game:GetService("RunService")
-
-local function IsWithin(position, instance)
-	local absolutePosition = instance.AbsolutePosition
-	local absoluteSize = instance.AbsoluteSize
-
-	return position.X >= absolutePosition.X and position.X <= absolutePosition.X + absoluteSize.X and position.Y >= absolutePosition.Y and position.Y <= absolutePosition.Y + absoluteSize.Y
+local function IsWithin(Position, Inst)
+	local AbsolutePosition = Inst.AbsolutePosition
+	local AbsoluteSize = Inst.AbsoluteSize
+	return Position.X >= AbsolutePosition.X and Position.X <= AbsolutePosition.X + AbsoluteSize.X and Position.Y >= AbsolutePosition.Y and Position.Y <= AbsolutePosition.Y + AbsoluteSize.Y
 end
 
-local function Smooth(from, to, options, dt)
-	if not options.Smooth then
-		return to
+local function Smooth(From, To, Options, DeltaTime)
+	if not Options.Smooth then
+		return To
 	end
 
-	local t = math.clamp(options.Speed, 0, 1)
+	local t = math.clamp(Options.Speed, 0, 1)
 	t = 1 / (1 + math.exp(-12 * (t - 0.5)))
-	t = 1 - (1 - t) ^ (dt * 60)
+	t = 1 - (1 - t) ^ (DeltaTime * 60)
 
-	return from + (to - from) * t
+	return From + (To - From) * t
 end
 
-userInputService.InputBegan:Connect(function(input: InputObject, gameProcessedEvent: boolean)
-	if activeDrag ~= nil then return end
-	if gameProcessedEvent then return end
-	if input.UserInputType ~= Enum.UserInputType.MouseButton1 and input.UserInputType ~= Enum.UserInputType.Touch then return end
+UserInputService.InputBegan:Connect(function(Input: InputObject, GameProcessedEvent: boolean)
+	if ActiveDraggable ~= nil then return end
+	if GameProcessedEvent then return end
+	if Input.UserInputType ~= Enum.UserInputType.MouseButton1 and Input.UserInputType ~= Enum.UserInputType.Touch then return end
 
-	for index, drag in pairs(drags) do
-		if not IsWithin(input.Position, drag.GetHandle()) then continue end
+	for _, draggable in pairs(Draggables) do
+		if not IsWithin(Input.Position, draggable.GetHandle()) then continue end
 
-		drag.Positions["x"] = input.Position.X
-		drag.Positions["y"] = input.Position.Y
-		drag.Positions["sx"] = drag.Positions["x"] - drag.Positions["cx"]
-		drag.Positions["sy"] = drag.Positions["y"] - drag.Positions["cy"]
-		drag.Dragging = true
-		drag.Input = input
-		drag.OnStartDragging(drag.Frame.Position)
-		activeDrag = drag
+		draggable.Positions["x"] = Input.Position.X
+		draggable.Positions["y"] = Input.Position.Y
+		draggable.Positions["sx"] = draggable.Positions["x"] - draggable.Positions["cx"]
+		draggable.Positions["sy"] = draggable.Positions["y"] - draggable.Positions["cy"]
+		draggable.Dragging = true
+		draggable.Input = Input
+		draggable.OnStartDragging(draggable.Frame.Position)
+		ActiveDraggable = draggable
 		break
 	end
 end)
 
-userInputService.InputEnded:Connect(function(input: InputObject, gameProcessedEvent: boolean)
-	if activeDrag == nil then return end
-	if input ~= activeDrag.Input then return end
+UserInputService.InputEnded:Connect(function(Input: InputObject)
+	if ActiveDraggable == nil then return end
+	if Input ~= ActiveDraggable.Input then return end
 
-	activeDrag.Dragging = false
-	activeDrag.Input = nil
-	activeDrag.OnStopDragging(activeDrag.Frame.Position)
-	activeDrag = nil
+	ActiveDraggable.Dragging = false
+	ActiveDraggable.Input = nil
+	ActiveDraggable.OnStopDragging(ActiveDraggable.Frame.Position)
+	ActiveDraggable = nil
 end)
 
-userInputService.InputChanged:Connect(function(input: InputObject, gameProcessedEvent: boolean)
-	if activeDrag == nil then return end
-	if input.UserInputType ~= Enum.UserInputType.MouseMovement and input ~= activeDrag.Input then return end
+UserInputService.InputChanged:Connect(function(Input: InputObject)
+	if ActiveDraggable == nil then return end
+	if Input.UserInputType ~= Enum.UserInputType.MouseMovement and Input ~= ActiveDraggable.Input then return end
 
-	activeDrag.Positions["x"] = input.Position.X
-	activeDrag.Positions["y"] = input.Position.Y	
+	ActiveDraggable.Positions["x"] = Input.Position.X
+	ActiveDraggable.Positions["y"] = Input.Position.Y	
 end)
 
-runService.Heartbeat:Connect(function(deltaTime)
-	for index, drag in pairs(drags) do
-		drag.Update(deltaTime)
+RunService.Heartbeat:Connect(function(DeltaTime)
+	for _, draggable in pairs(Draggables) do
+		draggable.Update(DeltaTime)
 	end
 end)
 
-function Draggable.New(frame, options)
+function Draggable.New(Frame, Options)
 	local self = {
 		OnStartDragging = function(position) end,
 		OnStopDragging = function(position) end,
 		OnUpdate = function(position) end,
-		Update = function(dt) end,
+		Update = function(DeltaTime) end,
 		Destroy = function() end,
 		GetHandle = function() end,
 		Dragging = false,
 		Input = nil,
-		Frame = frame,
+		Frame = Frame,
 		Options = {
 			Smooth = true,
 			Speed = 0.44,
@@ -88,8 +86,8 @@ function Draggable.New(frame, options)
 		Positions = {},
 	}
 
-	if options then
-		for key, value in pairs(options) do
+	if Options then
+		for key, value in pairs(Options) do
 			self.Options[key] = value
 		end
 	end
@@ -109,16 +107,16 @@ function Draggable.New(frame, options)
 	self.Positions["fx"] = self.Frame.Position.X.Offset
 	self.Positions["fy"] = self.Frame.Position.Y.Offset
 
-	self.Update = function(deltaTime)
+	self.Update = function(DeltaTime)
 		if self.Dragging then
 			self.Positions["cx"] = self.Positions["x"] - self.Positions["sx"]
 			self.Positions["cy"] = self.Positions["y"] - self.Positions["sy"]
 		end
 
-		local oldFx = self.Positions["fx"]
-		local oldFy = self.Positions["fy"]
-		self.Positions["fx"] = Smooth(self.Positions["fx"], self.Positions["cx"], self.Options, deltaTime)
-		self.Positions["fy"] = Smooth(self.Positions["fy"], self.Positions["cy"], self.Options, deltaTime)
+		local OldX = self.Positions["fx"]
+		local OldY = self.Positions["fy"]
+		self.Positions["fx"] = Smooth(self.Positions["fx"], self.Positions["cx"], self.Options, DeltaTime)
+		self.Positions["fy"] = Smooth(self.Positions["fy"], self.Positions["cy"], self.Options, DeltaTime)
 		self.Frame.Position = UDim2.new(self.Frame.Position.X.Scale, self.Positions["fx"], self.Frame.Position.Y.Scale, self.Positions["fy"])
 
 		if self.Options.Smooth then
@@ -128,25 +126,25 @@ function Draggable.New(frame, options)
 			return
 		end
 
-		if oldFx ~= self.Positions["fx"] or oldFy ~= self.Positions["fy"] then
+		if OldX ~= self.Positions["fx"] or OldY ~= self.Positions["fy"] then
 			self.OnUpdate(self.Frame.Position)
 		end
 	end
 
 	self.Destroy = function()
-		if activeDrag == self then
-			activeDrag = nil
+		if ActiveDraggable == self then
+			ActiveDraggable = nil
 		end
 
-		for i, drag in ipairs(drags) do
+		for i, drag in ipairs(Draggables) do
 			if drag == self then
-				table.remove(drags, i)
+				table.remove(Draggables, i)
 				break
 			end
 		end
 	end
 
-	table.insert(drags, self)
+	table.insert(Draggables, self)
 	return self
 end
 
