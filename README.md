@@ -25,7 +25,7 @@ end
 wait(5)
 drag.Destroy()
 ```
-
+<h6>-----</h6>
 GameSettings example:
 ```lua
 local GameSettings = require(game.ReplicatedStorage:WaitForChild("GameSettings"))
@@ -38,4 +38,38 @@ wait(5)
 
 savedQualitySettingListener.Disconnect()
 print("hi, SavedQualitySetting: " .. GameSettings.Get("SavedQualitySetting").Value)
+```
+<h6>-----</h6>
+[Animation](https://create.roblox.com/store/asset/74653002513678) example:
+```lua
+local BaseAnimation = game.ReplicatedStorage:WaitForChild("Animation")
+local EaseOutCubic = require(BaseAnimation:WaitForChild("EaseOutCubic"))
+
+local Animation = EaseOutCubic:New(script.Parent, 1000, { Position = UDim2.new(1, 0, 0, 0) })
+local HasReversed = false
+
+Animation:Play(function(progress)
+	if progress > 0.75 and not HasReversed then
+		HasReversed = true
+		Animation:SetReversed(true)
+		print("Back we go :D")
+	end
+
+	if progress < 0.05 then
+		Animation:SetReversed(false)
+		print("Nevermind")
+	end
+end):Wait()
+
+local Animation2 = EaseOutCubic:New({
+	Value = 0,
+	Target = 10,
+	Duration = 2500
+}):Play(function(value)
+	print(value)
+end)
+print("Hello from before finishing!")
+Animation2:Wait()
+print("Hello from after finishing!")
+Animation:Reverse():Play()
 ```
