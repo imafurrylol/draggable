@@ -77,6 +77,7 @@ function Animation:Constructor(Options, Duration, Properties)
 	self.Elapsed = 0
 	self.PlayValue = self.Value
 	self.Playing = false
+	self.Connections = {}
 end
 
 function Animation:SetTarget(Target)
@@ -140,7 +141,32 @@ function Animation:Stop()
 	return self
 end
 
-function Animation:Play(Callback)
+function Animation:Connect(Callback)
+    if Callback == nil or typeof(Callback) ~= "function" then
+        error("Callback must be a function!")
+    end
+
+    local Connection = {
+        Connected = true,
+        Callback = Callback
+    }
+
+    function Connection:Disconnect()
+        if not self.Connected then return end
+        self.Connected = false
+
+        for index, connection in pairs(Animation.Connections) do
+            if connection ~= Connection then continue end
+            table.remove(Animation.Connections, index)
+            break
+        end
+    end
+
+    table.insert(self.Connections, Connection)
+    return Connection
+end
+
+function Animation:Play()
 	if self.Playing then return self end
 	if self.Instance == nil then
 		self.PlayValue = self.Value
@@ -155,7 +181,7 @@ function Animation:Play(Callback)
 			Connection:Disconnect()
 			return
 		end
-		
+
 		self:Step(DeltaTime)
 		local Finished = self:IsFinished()
 
@@ -169,9 +195,14 @@ function Animation:Play(Callback)
 			end
 		end
 
-		if Callback ~= nil and typeof(Callback) == "function" then
-			Callback(self.Instance ~= nil and self.Progress or self.Value)
-		end
+		local Value = self.Instance ~= nil and self.Progress or self.Value
+        for index = #self.Connections, 1, -1 do
+            local Connection = self.Connections[index]
+            local Success, Err = pcall(Connection.Callback, Value)
+            if Success then continue end
+
+            warn("Animation connection errored: " .. Err)
+        end
 
 		if Finished then
 			self.Playing = false
