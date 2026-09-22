@@ -52,31 +52,55 @@ print("hi, SavedQualitySetting: " .. GameSettings.Get("SavedQualitySetting").Val
 local BaseAnimation = game.ReplicatedStorage:WaitForChild("Animation")
 local EaseOutCubic = require(BaseAnimation:WaitForChild("EaseOutCubic"))
 
-local Animation = EaseOutCubic:New(script.Parent, 1000, { Position = UDim2.new(1, 0, 0, 0) })
-local HasReversed = false
+local Animation = EaseOutCubic:New(script.Parent, 3000, { Position = UDim2.new(1, -100, 1, -100) }):Play()
+task.wait(0.05)
+print(":Play() does not yield, you can use :Wait() for that behavior")
+Animation:Wait()
 
-Animation:Play(function(progress)
-	if progress > 0.75 and not HasReversed then
-		HasReversed = true
-		Animation:SetReversed(true)
-		print("Back we go :D")
-	end
-
-	if progress < 0.05 then
-		Animation:SetReversed(false)
-		print("Nevermind")
-	end
-end):Wait()
-
-local Animation2 = EaseOutCubic:New({
-	Value = 0,
-	Target = 10,
-	Duration = 2500
-}):Play(function(value)
-	print(value)
-end)
-print("Hello from before finishing!")
-Animation2:Wait()
-print("Hello from after finishing!")
+print("You can also reverse the animation and re-use it")
 Animation:Reverse():Play()
+task.wait(0.05)
+
+print("You can create connections via :Connect(function), and they can be connected while the animation is playing")
+local Connection = Animation:Connect(function(Progress)
+	print("Progress: " .. Progress)
+end)
+Animation:Wait()
+
+print("But be careful, they stick around even after the Animation finishes, so be sure to call :Disconnect() when they are no longer needed.")
+Connection:Disconnect()
+task.wait(1)
+
+print("You can also reverse the animation while it's playing")
+local State = -1
+Connection = Animation:Play():Connect(function(Progress)
+	if Progress > 0.6 and State == -1 then
+		State = 0
+		Animation:SetReversed(true)
+		print("Reversed!")
+	end
+	
+	if Progress < 0.05 and State == 0 then
+		State = 1
+		Animation:SetReversed(false)
+		print("And back forward!")
+	end
+end)
+Animation:Wait()
+Connection:Disconnect()
+task.wait(1)
+
+print("You can also do raw value animations,")
+Animation = EaseOutCubic:New({
+	Value = 0,
+	Target = 1000,
+	Duration = 2500
+}):Play()
+
+Connection = Animation:Connect(function(Value)
+	print("Value: " .. Value)
+end)
+Animation:Wait()
+print("The same functions are available for value Animations")
+Connection:Disconnect()
 ```
