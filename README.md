@@ -61,7 +61,7 @@ print("You can also reverse the animation and re-use it")
 Animation:Reverse():Play()
 task.wait(0.05)
 
-print("You can create connections via :Connect(function), and they can be connected while the animation is playing")
+print("You can create connections via :Connect(function), and they can be created while the animation is playing")
 local Connection = Animation:Connect(function(Progress)
 	print("Progress: " .. Progress)
 end)
