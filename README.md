@@ -1,6 +1,7 @@
 If you find a bug with something, please create an [issue](https://github.com/imafurrylol/roblox/issues/new) :)
-
-
+<br>
+<br>
+<br>
 Draggable (https://create.roblox.com/store/asset/78228119243178) example:
 ```lua
 local Draggable = require(game.ReplicatedStorage.Draggable)
@@ -26,9 +27,9 @@ end
 task.wait(5)
 drag.Destroy()
 ```
-
-
-
+<br>
+<br>
+<br>
 GameSettings (https://github.com/imafurrylol/roblox/blob/main/GameSettings.lua) example:
 ```lua
 -- yes, this is mostly useless, I am just lazy and prefer to write fewer lines of code
@@ -43,9 +44,9 @@ task.wait(5)
 savedQualitySettingListener.Disconnect()
 print("hi, SavedQualitySetting: " .. GameSettings.Get("SavedQualitySetting").Value)
 ```
-
-
-
+<br>
+<br>
+<br>
 Animation (https://create.roblox.com/store/asset/74653002513678) example:
 ```lua
 local BaseAnimation = game:GetService("ReplicatedStorage"):WaitForChild("Animation")
