@@ -54,18 +54,22 @@ local EaseOutCubic = require(BaseAnimation:WaitForChild("EaseOutCubic"))
 
 local Animation = EaseOutCubic:New(script.Parent, 3000, { Position = UDim2.new(1, -100, 1, -100) }):Play()
 task.wait(0.05)
-print(":Play() does not yield, you can use :Wait() for that behavior")
+print(":Play() does not yield, you can use :Wait() for that behaviour")
 Animation:Wait()
 
 print("You can also reverse the animation and re-use it")
 Animation:Reverse():Play()
 task.wait(0.05)
 
-print("You can create connections via :Connect(function), and they can be created while the animation is playing")
+print("You can create connections via :Connect(function), and they can be connected while the animation is playing")
 local Connection = Animation:Connect(function(Progress)
 	print("Progress: " .. Progress)
 end)
 Animation:Wait()
+
+print("When the Animation finishes, the direction does not get reset. If it was reversed, playing it again will cause it to instantly complete!")
+print("If you need the Animation to go forwards, explicitly change the direction.")
+Animation:Reverse() -- You could also use Animation:SetReversed(false) to make sure! But in this scenario, this will always set it to go forwards.
 
 print("But be careful, they stick around even after the Animation finishes, so be sure to call :Disconnect() when they are no longer needed.")
 Connection:Disconnect()
