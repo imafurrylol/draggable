@@ -12,12 +12,12 @@ Settings.Changed:Connect(function(SettingName)
     local SettingListeners = Listeners[SettingName]
     if SettingListeners == nil then return end	
 	
-    for i = #SettingListeners, 1, -1 do
-        local Listener = SettingListeners[i]
+    for index = #SettingListeners, 1, -1 do
+        local Listener = SettingListeners[index]
         local Success, Err = pcall(Listener.Callback, Value)
         if Success then continue end
 		
-        warn("listener for " .. SettingName .. " errored: " .. Err)
+        warn("Listener for " .. SettingName .. " errored: " .. Err)
     end
 end)
 
