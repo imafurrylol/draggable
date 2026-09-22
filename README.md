@@ -49,62 +49,67 @@ print("hi, SavedQualitySetting: " .. GameSettings.Get("SavedQualitySetting").Val
 
 [Animation](https://create.roblox.com/store/asset/74653002513678) example:
 ```lua
-local BaseAnimation = game.ReplicatedStorage:WaitForChild("Animation")
+local BaseAnimation = game:GetService("ReplicatedStorage"):WaitForChild("Animation")
 local EaseOutCubic = require(BaseAnimation:WaitForChild("EaseOutCubic"))
+local ScreenGui = Instance.new("ScreenGui", game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"))
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Size = UDim2.fromOffset(100, 100)
 
-local Animation = EaseOutCubic:New(script.Parent, 3000, { Position = UDim2.new(1, -100, 1, -100) }):Play() -- Durations are in milliseconds
-task.wait(0.05)
-print(":Play() does not yield, you can use :Wait() for that behaviour")
+-- The duration is in milliseconds
+local Animation = EaseOutCubic:New(Frame, 3000, { Position = UDim2.new(1, -100, 1, -100) }):Play()
+print(":Play() does not yield")
+
+-- To yield (wait until the Animation has completed), you can call :Wait()
 Animation:Wait()
+print("Animation completed")
 
-print("You can also reverse the animation and re-use it")
-Animation:Reverse():Play()
-task.wait(0.05)
+-- You can re-use Animations and also reverse them.
+Animation:Reverse():Play() -- Method calls are chainable! Reverse flips the current Direction
 
-print("You can create connections via :Connect(function), and they can be connected while the animation is playing")
-local Connection = Animation:Connect(function(Progress)
+-- You can create connections for the Animation, either before you play it or while it's running.
+-- Once you've created a connection, it persists for the lifetime of the Animation. Be sure to Disconnect it if it's no longer in use, otherwise everytime the Animation is played, the callback will be ran.
+local Connection = Animation:Connect(function(Progress) -- When you are Animating an Instance, the parameter is a normalized progress from 0-1
 	print("Progress: " .. Progress)
-end)
-Animation:Wait()
+end):Wait()
 
-print("When the Animation finishes, the direction does not get reset. If it was reversed, playing it again will cause it to instantly complete!")
-print("If you need the Animation to go forwards, explicitly change the direction.")
-Animation:Reverse() -- You could also use Animation:SetReversed(false) to make sure! But in this scenario, this will always set it to go forwards.
-
-print("But be careful, they stick around even after the Animation finishes, so be sure to call :Disconnect() when they are no longer needed.")
 Connection:Disconnect()
+
 task.wait(1)
 
-print("You can also reverse the animation while it's playing")
 local State = -1
-Connection = Animation:Play():Connect(function(Progress)
-	if Progress > 0.6 and State == -1 then
+local SecondConnection = Animation:Reverse():Play():Connect(function(Progress) -- Changing the direction of the Animation during the Animation is supported!
+	if Progress >= 0.7 and State == -1 then
 		State = 0
-		Animation:SetReversed(true)
-		print("Reversed!")
+		Animation:Reverse() -- Flips the direction, causing it to go backwards
+		print("Backwards!")
 	end
-	
-	if Progress < 0.05 and State == 0 then
+
+	if Progress <= 0.05 and State == 0 then
 		State = 1
-		Animation:SetReversed(false)
-		print("And back forward!")
+		Animation:SetReversed(false) -- Explicitly set it to go forwards. Not needed here, though useful if you are unsure of the current direction.
+		print("Forwards!")
 	end
 end)
-Animation:Wait()
-Connection:Disconnect()
+SecondConnection:Wait():Disconnect() -- You can also chain calls like this! If you wanted, it could be directly after the connect, e.g. Animation:Connect(x):Wait():Disconnect()
+
 task.wait(1)
 
-print("You can also do raw value animations,")
-Animation = EaseOutCubic:New({
+-- You can create raw value Animations, you do not have to Animate an instance's properties.
+local ValueAnimation = EaseOutCubic:New({
 	Value = 0,
 	Target = 1000,
 	Duration = 2500
-}):Play()
+})
 
-Connection = Animation:Connect(function(Value)
+ValueAnimation:Play():Connect(function(Value) -- When it's a raw value Animation, it is the actual value, not a normalized progress of 0-1
 	print("Value: " .. Value)
-end)
-Animation:Wait()
-print("The same functions are available for value Animations")
-Connection:Disconnect()
+end):Wait():Disconnect()
+
+task.wait(1)
+print("Back to 0!")
+
+-- You can also reverse value Animations
+ValueAnimation:Reverse():Play():Connect(function(Value)
+	print("Value: " .. Value)
+end):Wait():Disconnect()
 ```
