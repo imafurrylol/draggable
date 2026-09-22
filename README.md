@@ -1,8 +1,7 @@
 If you find a bug with something, please create an [issue](https://github.com/imafurrylol/roblox/issues/new) :)
 
 
-Draggable example:
-<h6>get it here: https://create.roblox.com/store/asset/78228119243178</h6>
+Draggable (https://create.roblox.com/store/asset/78228119243178) example:
 ```lua
 local Draggable = require(game.ReplicatedStorage.Draggable)
 local drag = Draggable.New(script.Parent)
@@ -30,8 +29,7 @@ drag.Destroy()
 
 
 
-GameSettings example:
-<h6>get it here: https://github.com/imafurrylol/roblox/blob/main/GameSettings.lua</h6>
+GameSettings (https://github.com/imafurrylol/roblox/blob/main/GameSettings.lua) example:
 ```lua
 -- yes, this is mostly useless, I am just lazy and prefer to write fewer lines of code
 local GameSettings = require(game.ReplicatedStorage:WaitForChild("GameSettings"))
@@ -48,8 +46,7 @@ print("hi, SavedQualitySetting: " .. GameSettings.Get("SavedQualitySetting").Val
 
 
 
-Animation example:
-<h6>get it here: [https://create.roblox.com/store/asset/78228119243178](https://create.roblox.com/store/asset/74653002513678)</h6>
+Animation (https://create.roblox.com/store/asset/74653002513678) example:
 ```lua
 local BaseAnimation = game:GetService("ReplicatedStorage"):WaitForChild("Animation")
 local EaseOutCubic = require(BaseAnimation:WaitForChild("EaseOutCubic"))
