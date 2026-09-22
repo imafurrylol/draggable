@@ -76,7 +76,6 @@ function Animation:Constructor(Options, Duration, Properties)
 	self.Duration = math.max(1, Options.Duration) / 1000
 	self.Direction = 1
 	self.Elapsed = 0
-	self.PlayValue = self.Value
 	self.Playing = false
 	self.Connections = {}
 end
@@ -111,10 +110,9 @@ function Animation:Step(DeltaTime)
 		return self.Progress
 	end
 
-	local Target = self.Direction == 1 and self.Target or self.StartValue
 	self.Elapsed = math.clamp(self.Elapsed + DeltaTime * self.Direction, 0, self.Duration)
-	local Progress = self.Elapsed / self.Duration
-	self.Value = self:Evaluate(self.PlayValue, Target, Progress)
+	local Progress = self:Evaluate(0, 1, self.Elapsed / self.Duration)
+	self.Value = Interpolate(self.StartValue, self.Target, Progress)
 	return self.Value
 end
 
@@ -148,11 +146,18 @@ function Animation:Connect(Callback)
 	end
 
 	local Connection = {
+		Type = "Connection",
 		Connected = true,
 		Callback = Callback,
 		Animation = self
 	}
-
+	
+	function Connection:Wait()
+		if not self.Connected then return end
+		self.Animation:Wait()
+		return self
+	end
+	
 	function Connection:Disconnect()
 		if not self.Connected then return end
 		self.Connected = false
@@ -171,7 +176,6 @@ end
 function Animation:Play()
 	if self.Playing then return self end
 	if self.Instance == nil then
-		self.PlayValue = self.Value
 		self.Elapsed = self.Direction == 1 and 0 or self.Duration
 	end
 
