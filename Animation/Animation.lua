@@ -57,6 +57,7 @@ function Animation:Constructor(Options, Duration, Properties)
 		self.Progress = 0
 		self.Playing = false
 		self.Properties = {}
+		self.Connections = {}
 
 		for property, target in pairs(Properties) do
 			self.Properties[property] = { Start = self.Instance[property], Target = target }
@@ -142,28 +143,28 @@ function Animation:Stop()
 end
 
 function Animation:Connect(Callback)
-    if Callback == nil or typeof(Callback) ~= "function" then
-        error("Callback must be a function!")
-    end
+	if Callback == nil or typeof(Callback) ~= "function" then
+		error("Callback must be a function!")
+	end
 
-    local Connection = {
-        Connected = true,
-        Callback = Callback
-    }
+	local Connection = {
+		Connected = true,
+		Callback = Callback
+	}
 
-    function Connection:Disconnect()
-        if not self.Connected then return end
-        self.Connected = false
+	function Connection:Disconnect()
+		if not self.Connected then return end
+		self.Connected = false
 
-        for index, connection in pairs(Animation.Connections) do
-            if connection ~= Connection then continue end
-            table.remove(Animation.Connections, index)
-            break
-        end
-    end
+		for index, connection in pairs(Animation.Connections) do
+			if connection ~= Connection then continue end
+			table.remove(Animation.Connections, index)
+			break
+		end
+	end
 
-    table.insert(self.Connections, Connection)
-    return Connection
+	table.insert(self.Connections, Connection)
+	return Connection
 end
 
 function Animation:Play()
@@ -196,13 +197,13 @@ function Animation:Play()
 		end
 
 		local Value = self.Instance ~= nil and self.Progress or self.Value
-        for index = #self.Connections, 1, -1 do
-            local Connection = self.Connections[index]
-            local Success, Err = pcall(Connection.Callback, Value)
-            if Success then continue end
+		for index = #self.Connections, 1, -1 do
+			local Connection = self.Connections[index]
+			local Success, Err = pcall(Connection.Callback, Value)
+			if Success then continue end
 
-            warn("Animation connection errored: " .. Err)
-        end
+			warn("Animation connection errored: " .. Err)
+		end
 
 		if Finished then
 			self.Playing = false
