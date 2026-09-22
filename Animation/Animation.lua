@@ -149,16 +149,17 @@ function Animation:Connect(Callback)
 
 	local Connection = {
 		Connected = true,
-		Callback = Callback
+		Callback = Callback,
+		Animation = self
 	}
 
 	function Connection:Disconnect()
 		if not self.Connected then return end
 		self.Connected = false
 
-		for index, connection in pairs(Animation.Connections) do
+		for index, connection in pairs(self.Animation.Connections) do
 			if connection ~= Connection then continue end
-			table.remove(Animation.Connections, index)
+			table.remove(self.Animation.Connections, index)
 			break
 		end
 	end
