@@ -52,7 +52,7 @@ print("hi, SavedQualitySetting: " .. GameSettings.Get("SavedQualitySetting").Val
 local BaseAnimation = game.ReplicatedStorage:WaitForChild("Animation")
 local EaseOutCubic = require(BaseAnimation:WaitForChild("EaseOutCubic"))
 
-local Animation = EaseOutCubic:New(script.Parent, 3000, { Position = UDim2.new(1, -100, 1, -100) }):Play()
+local Animation = EaseOutCubic:New(script.Parent, 3000, { Position = UDim2.new(1, -100, 1, -100) }):Play() -- Durations are in milliseconds
 task.wait(0.05)
 print(":Play() does not yield, you can use :Wait() for that behaviour")
 Animation:Wait()
