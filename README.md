@@ -67,7 +67,10 @@ print("Animation completed")
 Animation:Reverse():Play() -- Method calls are chainable! Reverse flips the current Direction
 
 -- You can create connections for the Animation, either before you play it or while it's running.
--- Once you've created a connection, it persists for the lifetime of the Animation. Be sure to Disconnect it if it's no longer in use, otherwise everytime the Animation is played, the callback will be ran.
+--[[
+	Once you've created a connection, it persists for the lifetime of the Animation.
+	Make sure to disconnect it if it's no longer in use!
+]]
 local Connection = Animation:Connect(function(Progress) -- When you are Animating an Instance, the parameter is a normalized progress from 0-1
 	print("Progress: " .. Progress)
 end):Wait() -- Calling :Wait() on a Connection waits for the Animation to finish, then returns the Connection itself.
