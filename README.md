@@ -7,7 +7,7 @@ Draggable (https://create.roblox.com/store/asset/78228119243178) example:
 local Draggable = require(game.ReplicatedStorage.Draggable)
 local drag = Draggable.New(script.Parent)
 -- options:
--- Smooth: boolean (whether it smooths or not, default is true
+-- Smooth: boolean (whether it smooths or not, default is true)
 -- Speed: number (higher = faster, lower = slower, default is 0.44)
 -- Handle: GuiObject (default is nil, if not set, anywhere on the input GuiObject will start the drag)
 -- example: local drag = Draggable.New(GUI, { Smooth = false, Handle = GUI.handle })
