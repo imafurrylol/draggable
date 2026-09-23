@@ -65,7 +65,7 @@ function Animation:Constructor(Options, Duration, Properties)
 	self.Playing = false
 	self.Direction = 1
 	self.Elapsed = 0
-	self.Completed = Instance.new("BindableEvent")
+	self._Completed = Instance.new("BindableEvent")
 	self.Duration = math.max(1, _Duration) / 1000
 
 	if typeof(Options) == "Instance" then
@@ -150,7 +150,7 @@ end
 
 function Animation:Wait()
 	if not self.Playing then return self end
-	self.Completed.Event:Wait()
+	self._Completed.Event:Wait()
 
 	return self
 end
@@ -174,7 +174,7 @@ end
 function Animation:Stop()
 	if not self.Playing then return self end
 	self.Playing = false
-	self.Completed:Fire()
+	self._Completed:Fire()
 
 	local Value = self.Instance ~= nil and self.Progress or self.Value
 	_Call(self, Value, "Completed")
@@ -186,7 +186,7 @@ local function _Connect(self: Animation, Callback, Type)
 	if Callback == nil or typeof(Callback) ~= "function" then
 		error("Callback must be a function!")
 	end
-
+	
 	local Connection = {
 		Type = Type,
 		Connected = true,
@@ -258,7 +258,7 @@ function Animation:Play()
 		if Finished then
 			if self.Playing then
 				self.Playing = false
-				self.Completed:Fire()
+				self._Completed:Fire()
 
 				_Call(self, Value, "Completed")
 			end
