@@ -3,24 +3,6 @@ If you find a bug with something, please create an [issue](https://github.com/im
 <br>
 <br>
 
-GameSettings (https://github.com/imafurrylol/roblox/blob/main/GameSettings.lua) example:
-```lua
--- yes, this is mostly useless, I am just lazy and prefer to write fewer lines of code
-local GameSettings = require(game.ReplicatedStorage:WaitForChild("GameSettings"))
-
-local savedQualitySettingListener = GameSettings.OnChange("SavedQualityLevel", function(value: Enum.SavedQualitySetting)
-	print("SavedQualitySetting: " .. value.Value)
-end)
-
-task.wait(5)
-
-savedQualitySettingListener.Disconnect()
-print("hi, SavedQualitySetting: " .. GameSettings.Get("SavedQualitySetting").Value)
-```
-<br>
-<br>
-<br>
-
 Animation (https://create.roblox.com/store/asset/74653002513678) example:
 ```lua
 local BaseAnimation = game:GetService("ReplicatedStorage"):WaitForChild("Animation")
