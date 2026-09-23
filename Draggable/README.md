@@ -1,5 +1,6 @@
-Draggable (https://create.roblox.com/store/asset/78228119243178) example:
+https://create.roblox.com/store/asset/78228119243178
 
+Example:
 ```lua
 local Draggable = require(game.ReplicatedStorage.Draggable)
 local drag = Draggable.New(script.Parent)
