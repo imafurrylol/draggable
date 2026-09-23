@@ -9,3 +9,5 @@ https://github.com/imafurrylol/roblox/blob/main/Vector/README.md
 https://github.com/imafurrylol/roblox/blob/main/Draggable/README.md
 <br>
 https://github.com/imafurrylol/roblox/blob/main/GameSettings/README.md
+<br>
+https://github.com/imafurrylol/roblox/blob/main/Signal/README.md
