@@ -65,7 +65,22 @@ task.wait(1)
 print("Back to 0!")
 
 -- You can also reverse value Animations
-ValueAnimation:Reverse():Play():Connect(function(Value)
+local ThirdConnection = ValueAnimation:Reverse():Play():Connect(function(Value)
 	print("Value: " .. Value)
+end)
+
+--[[
+	Just like connections, whenever you created a "Completed" connection, it persists for the lifetime of the Animation.
+	Ensure you clean up any Completed connections!
+]]
+ValueAnimation:Completed(function(Value)
+	print("Finished on: " .. Value)
+end):Wait():Disconnect()
+
+-- Clean up the connection
+ThirdConnection:Disconnect()
+
+ValueAnimation:Reverse():Play():Completed(function(Value)
+	print("The others were disconnected! Finished on: " .. Value)
 end):Wait():Disconnect()
 ```
