@@ -155,21 +155,40 @@ function Animation:Wait()
 	return self
 end
 
+local function _Call(self: Animation, Value, Type)
+	for index = #self.Connections, 1, -1 do
+		if Type == "Connection" and not self.Playing then break end
+		
+		local Connection = self.Connections[index]
+
+		if Connection.Connected and Connection.Type == Type then
+			local Success, Err = pcall(Connection.Callback, Value)
+
+			if not Success then
+				warn("Animation " .. Type .. " errored: " .. Err)
+			end
+		end
+	end
+end
+
 function Animation:Stop()
 	if not self.Playing then return self end
 	self.Playing = false
 	self.Completed:Fire()
 
+	local Value = self.Instance ~= nil and self.Progress or self.Value
+	_Call(self, Value, "Completed")
+
 	return self
 end
 
-function Animation:Connect(Callback)
+local function _Connect(self: Animation, Callback, Type)
 	if Callback == nil or typeof(Callback) ~= "function" then
 		error("Callback must be a function!")
 	end
 
 	local Connection = {
-		Type = "Connection",
+		Type = Type,
 		Connected = true,
 		Callback = Callback,
 		Animation = self
@@ -185,15 +204,24 @@ function Animation:Connect(Callback)
 		if not self.Connected then return end
 		self.Connected = false
 
-		for index, connection in pairs(self.Animation.Connections) do
-			if connection ~= Connection then continue end
-			table.remove(self.Animation.Connections, index)
-			break
+		for index, connection in ipairs(self.Animation.Connections) do
+			if connection == self then
+				table.remove(self.Animation.Connections, index)
+				break
+			end
 		end
 	end
 
 	table.insert(self.Connections, Connection)
 	return Connection
+end
+
+function Animation:Connect(Callback)
+	return _Connect(self, Callback, "Connection")
+end
+
+function Animation:Completed(Callback)
+	return _Connect(self, Callback, "Completed")
 end
 
 function Animation:Play()
@@ -225,19 +253,14 @@ function Animation:Play()
 		end
 
 		local Value = self.Instance ~= nil and self.Progress or self.Value
-		for index = #self.Connections, 1, -1 do
-			local Connection = self.Connections[index]
-			local Success, Err = pcall(Connection.Callback, Value)
-			if not Success then
-				warn("Animation connection errored: " .. Err)
-			end
-			if not self.Playing then break end
-		end
+		_Call(self, Value, "Connection")
 
 		if Finished then
 			if self.Playing then
 				self.Playing = false
 				self.Completed:Fire()
+
+				_Call(self, Value, "Completed")
 			end
 			Connection:Disconnect()
 		elseif not self.Playing then
