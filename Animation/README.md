@@ -1,4 +1,4 @@
-Get it from the Creator Store: https://create.roblox.com/store/asset/74653002513678
+https://create.roblox.com/store/asset/74653002513678
 
 Example:
 ```lua
