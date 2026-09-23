@@ -45,19 +45,37 @@ end
 local Animation = Extend()
 
 function Animation:Constructor(Options, Duration, Properties)
+	if Options == nil or (typeof(Options) ~= "table" and typeof(Options) ~= "Instance") then
+		error("invalid constructor")
+	end
+
+	local _Duration
+
 	if typeof(Options) == "Instance" then
-		if typeof(Duration) ~= "number" or typeof(Properties) ~= "table" then
+		_Duration = Duration
+	else
+		_Duration = Options.Duration
+	end
+
+	if typeof(_Duration) ~= "number" or _Duration % 1 ~= 0 then
+		error("invalid duration! must be a valid integer")
+	end
+
+	self.Connections = {}
+	self.Playing = false
+	self.Direction = 1
+	self.Elapsed = 0
+	self.Completed = Instance.new("BindableEvent")
+	self.Duration = math.max(1, _Duration) / 1000
+
+	if typeof(Options) == "Instance" then
+		if typeof(Properties) ~= "table" then
 			error("invalid constructor")
 		end
 
 		self.Instance = Options
-		self.Duration = math.max(1, Duration) / 1000
-		self.Direction = 1
-		self.Elapsed = 0
 		self.Progress = 0
-		self.Playing = false
 		self.Properties = {}
-		self.Connections = {}
 
 		for property, target in pairs(Properties) do
 			self.Properties[property] = { Start = self.Instance[property], Target = target }
@@ -66,18 +84,17 @@ function Animation:Constructor(Options, Duration, Properties)
 		return
 	end
 
-	if Options == nil or typeof(Options.Duration) ~= "number" then
-		error("invalid constructor")
+	if Options.Value ~= nil and typeof(Options.Value) ~= "number" then
+		error("invalid value! must be a number")
 	end
 
-	self.Value = Options.Value ~= nil and typeof(Options.Value) == "number" and Options.Value or 0
+	if Options.Target ~= nil and typeof(Options.Target) ~= "number" then
+		error("invalid target! must be a number")
+	end
+	
+	self.Value = Options.Value or 0
 	self.StartValue = self.Value
-	self.Target = typeof(Options.Target) == "number" and Options.Target or self.Value
-	self.Duration = math.max(1, Options.Duration) / 1000
-	self.Direction = 1
-	self.Elapsed = 0
-	self.Playing = false
-	self.Connections = {}
+	self.Target = Options.Target or self.Value
 end
 
 function Animation:SetTarget(Target)
@@ -88,9 +105,10 @@ function Animation:SetTarget(Target)
 end
 
 function Animation:SetDuration(Duration)
-	if Duration == nil or typeof(Duration) ~= "number" then
-		error("duration must be a number")
+	if Duration == nil or typeof(Duration) ~= "number" or Duration ~= Duration or Duration % 1 ~= 0 then
+		error("duration must be a valid integer")
 	end
+
 	self.Duration = math.max(1, Duration) / 1000
 end
 
@@ -131,12 +149,17 @@ function Animation:SetReversed(Reversed)
 end
 
 function Animation:Wait()
-	repeat task.wait() until not self.Playing
+	if not self.Playing then return self end
+	self.Completed.Event:Wait()
+
 	return self
 end
 
 function Animation:Stop()
+	if not self.Playing then return self end
 	self.Playing = false
+	self.Completed:Fire()
+
 	return self
 end
 
@@ -151,13 +174,13 @@ function Animation:Connect(Callback)
 		Callback = Callback,
 		Animation = self
 	}
-	
+
 	function Connection:Wait()
 		if not self.Connected then return end
 		self.Animation:Wait()
 		return self
 	end
-	
+
 	function Connection:Disconnect()
 		if not self.Connected then return end
 		self.Connected = false
@@ -205,13 +228,19 @@ function Animation:Play()
 		for index = #self.Connections, 1, -1 do
 			local Connection = self.Connections[index]
 			local Success, Err = pcall(Connection.Callback, Value)
-			if Success then continue end
-
-			warn("Animation connection errored: " .. Err)
+			if not Success then
+				warn("Animation connection errored: " .. Err)
+			end
+			if not self.Playing then break end
 		end
 
 		if Finished then
-			self.Playing = false
+			if self.Playing then
+				self.Playing = false
+				self.Completed:Fire()
+			end
+			Connection:Disconnect()
+		elseif not self.Playing then
 			Connection:Disconnect()
 		end
 	end)
