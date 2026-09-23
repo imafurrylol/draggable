@@ -1,3 +1,5 @@
+Mostly useless, but useful whenever you need it.
+
 Example:
 
 ```lua
