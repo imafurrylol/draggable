@@ -3,27 +3,32 @@ local Vector = {}
 local VectorMetatable = { __index = Vector }
 
 export type Vector<T> = {
-	push_front: (Value: T) -> (),
-	push_back: (Value: T) -> (),
+	push_front: (Value: T) -> (), -- vector:push_front(1)
+	push_back: (Value: T) -> (), -- vector:push_back(1)
 	emplace: (Index: number, Constructor: (...any) -> T, ...any) -> (),
 	emplace_back: (Constructor: (...any) -> T, ...any) -> (),
 	emplace_front: (Constructor: (...any) -> T, ...any) -> (),
-	insert: (Index: number, Value: T) -> (),
-	erase: (Index: number) -> (),
-	at: (Index: number) -> T,
-	clear: () -> (),
-	empty: () -> boolean,
-	size: () -> number,
-	iter: () -> () -> (number, T)?,
-	find: (Value: T) -> number?,
-	find_if: (Predicate: (T) -> boolean) -> (number?, T?),
-	filter: (Predicate: (T) -> boolean) -> Vector<T>,
-	erase_if: (Predicate: (T) -> boolean) -> (),
-	reverse: () -> (),
-	pop_front: () -> (),
-	pop_back: () -> (),
-	front: () -> T,
-	back: () -> T
+	insert: (Index: number, Value: T) -> (), -- vector:insert(3, 4)
+	erase: (Index: number) -> (), -- vector:erase(3)
+	at: (Index: number) -> T, -- vector:at(3)
+	clear: () -> (), -- vector:clear()
+	empty: () -> boolean, -- vector:empty()
+	size: () -> number, -- vector:size()
+	iter: () -> () -> (number, T)?, -- for index, value in vector:iter()
+	find: (Value: T) -> number?, -- local index = vector:find(4)
+	contains: (Value: T) -> boolean, -- if vector:contains(4) then ...
+	find_if: (Predicate: (T) -> boolean) -> (number?, T?), -- local index, value = vector:find_if(function(v) return v == 4 end)
+	filter: (Predicate: (T) -> boolean) -> Vector<T>, -- local nofours = vector:filter(function(v) return v == 4 end)
+	sort: (Comparator: (T, T) -> boolean) -> (), -- vector:sort(function(v, v1) return v < v1 end)
+	erase_if: (Predicate: (T) -> boolean) -> (), -- vector:erase_if(function(v) return v ~= 4 end)
+	erase_range: (Begin: number, End: number) -> (), -- vector:erase_range(1, 4) -- erases 1,2,3
+	count: (Value: T) -> number, -- local fours = vector:count(4)
+	count_if: (Predicate: (T) -> boolean) -> number, -- local fours = vector:count_if(function(v) return v == 4 end)
+	reverse: () -> (), -- vector:reverse()
+	pop_front: () -> (), -- vector:pop_front()
+	pop_back: () -> (), -- vector:pop_front()
+	front: () -> T, -- local front = vector:front()
+	back: () -> T -- local back = vector:back()
 }
 
 local function AssertInBounds<T>(self: Vector<T>, Index: number, Extra: number?)
@@ -84,6 +89,10 @@ function Vector.find<T>(self: Vector<T>, Value: T): number?
 	return nil
 end
 
+function Vector.contains<T>(self: Vector<T>, Value: T): boolean
+	return self:find(Value) ~= nil
+end
+
 function Vector.find_if<T>(self: Vector<T>, Predicate: (T) -> boolean): (number?, T?)
 	for index, value in self:iter() do
 		if Predicate(value) then
@@ -96,14 +105,79 @@ end
 
 function Vector.filter<T>(self: Vector<T>, Predicate: (T) -> boolean): Vector<T>
 	local FreshVector = Vector.new<<T>>()
-	
-	for _, value in self:iter() do
+	local Size = self:size()
+
+	for index = 1, Size do
+		local value = self._Objects[index]
+
 		if Predicate(value) then
 			FreshVector:push_back(value)
 		end
 	end
 
 	return FreshVector
+end
+
+function Vector.sort<T>(self: Vector<T>, Comparator: (T, T) -> boolean)
+	local Size = self:size()
+
+	if Size <= 1 then
+		return
+	end
+
+	local Buffer = table.create(Size)
+
+	local function Merge(Low: number, Mid: number, High: number)
+		local Left = Low
+		local Right = Mid + 1
+		local Index = Low
+
+		while Left <= Mid and Right <= High do
+			if Comparator(self._Objects[Left], self._Objects[Right]) then
+				Buffer[Index] = self._Objects[Left]
+				Left += 1
+			else
+				Buffer[Index] = self._Objects[Right]
+				Right += 1
+			end
+
+			Index += 1
+		end
+
+		while Left <= Mid do
+			Buffer[Index] = self._Objects[Left]
+			Left += 1
+			Index += 1
+		end
+
+		while Right <= High do
+			Buffer[Index] = self._Objects[Right]
+			Right += 1
+			Index += 1
+		end
+
+		for i = Low, High do
+			self._Objects[i] = Buffer[i]
+		end
+	end
+
+	local function Sort(Low: number, High: number)
+		if Low >= High then
+			return
+		end
+
+		local Mid = math.floor((Low + High) / 2)
+		Sort(Low, Mid)
+		Sort(Mid + 1, High)
+
+		if not Comparator(self._Objects[Mid + 1], self._Objects[Mid]) then
+			return
+		end
+
+		Merge(Low, Mid, High)
+	end
+
+	Sort(1, Size)
 end
 
 function Vector.erase_if<T>(self: Vector<T>, Predicate: (T) -> boolean)
@@ -124,9 +198,62 @@ function Vector.erase_if<T>(self: Vector<T>, Predicate: (T) -> boolean)
 	end
 end
 
+function Vector.erase_range<T>(self: Vector<T>, Begin: number, End: number)
+	AssertInteger(Begin)
+	AssertInteger(End)
+	AssertInBounds(self, Begin, -1)
+	AssertInBounds(self, End, 1)
+	if Begin > End then
+		error("erase_range: begin index " .. Begin .. " is greater than end index " .. End, 2)
+	end
+
+	local Size = self:size()
+	local Index = 1
+	for index = 1, Size do
+		local value = self._Objects[index]
+
+		if index < Begin or index >= End then
+			self._Objects[Index] = value
+			Index += 1
+		end
+	end
+
+	for index = Index, Size do
+		self._Objects[index] = nil
+	end
+end
+
+function Vector.count<T>(self: Vector<T>, Value: T): number
+	local Count = 0
+	local Size = self:size()
+
+	for index = Size, 1, -1 do
+		local value = self._Objects[index]
+
+		if value == Value then
+			Count += 1
+		end
+	end
+
+	return Count
+end
+
+function Vector.count_if<T>(self: Vector<T>, Predicate: (T) -> boolean): number
+	local Count = 0
+	local Size = self:size()
+
+	for index = Size, 1, -1 do
+		local value = self._Objects[index]
+		if Predicate(value) then
+			Count += 1
+		end
+	end
+
+	return Count
+end
+
 function Vector:erase(Index: number)
 	AssertInteger(Index)
-	AssertNotEmpty(self)
 	AssertInBounds(self, Index)
 
 	local Size = self:size()
@@ -200,18 +327,15 @@ function Vector.push_front<T>(self: Vector<T>, Value: T)
 end
 
 function Vector:front()
-	AssertNotEmpty(self)
 	return self:at(1)
 end
 
 function Vector:back()
-	AssertNotEmpty(self)
 	return self:at(self:size())
 end
 
 function Vector:at(Index: number)
 	AssertInteger(Index)
-	AssertNotEmpty(self)
 	AssertInBounds(self, Index)
 
 	return self._Objects[Index]
