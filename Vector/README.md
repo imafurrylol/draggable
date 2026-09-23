@@ -1,6 +1,11 @@
 https://create.roblox.com/store/asset/81712460662745
 
-Basically a fancy wrapper for normal tables. No example usage/documentation, read the type.
+C++ std::vector-ish vector implementation. No documentation/example usage, read the type.
+
+```lua
+local vector = Vector.new<<number>>()
+local vector2 = Vector.new("hello")
+```
 
 ```lua
 export type Vector<T> = {
