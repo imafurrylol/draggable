@@ -13,10 +13,9 @@ local function RunCallback<T...>(self: Connection<T...>, ...: T...): ()
 
 	self.Coroutine = nil
 	local Success, Error = xpcall(self.Callback, debug.traceback, ...)
+	if Success then continue end
 
-	if not Success then
-		warn(Error)
-	end
+	warn(Error)
 end
 
 local function Worker<T...>(self: Connection<T...>, ...: T...): ()
@@ -39,16 +38,16 @@ function Connection.new<T...>(Callback: (T...) -> ()): Connection<T...>
 end
 
 function Connection.Disconnect<T...>(self: Connection<T...>): ()
-	if not self.Connected then return end
+	if not self.Connected then
+		return
+	end
 
 	self.Connected = false
 
 	local Coroutine = self.Coroutine
 	self.Coroutine = nil
 
-	if Coroutine ~= nil then
-		task.cancel(Coroutine)
-	end
+	if Coroutine ~= nil then task.cancel(Coroutine) end
 end
 
 return Connection
