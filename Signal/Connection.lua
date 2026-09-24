@@ -38,9 +38,7 @@ function Connection.new<T...>(Callback: (T...) -> ()): Connection<T...>
 end
 
 function Connection.Disconnect<T...>(self: Connection<T...>): ()
-	if not self.Connected then
-		return
-	end
+	if not self.Connected then return end
 
 	self.Connected = false
 
