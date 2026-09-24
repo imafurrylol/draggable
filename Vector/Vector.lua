@@ -3,32 +3,41 @@ local Vector = {}
 local VectorMetatable = { __index = Vector }
 
 export type Vector<T> = {
-	push_front: (Value: T) -> (), -- vector:push_front(1)
-	push_back: (Value: T) -> (), -- vector:push_back(1)
-	emplace: (Index: number, Constructor: (...any) -> T, ...any) -> (),
-	emplace_back: (Constructor: (...any) -> T, ...any) -> (),
-	emplace_front: (Constructor: (...any) -> T, ...any) -> (),
-	insert: (Index: number, Value: T) -> (), -- vector:insert(3, 4)
-	erase: (Index: number) -> (), -- vector:erase(3)
+	front: () -> T,
+	back: () -> T,
+
+	push_front: (Value: T) -> T,
+	push_back: (Value: T) -> T,
+
+	pop_front: () -> (),
+	pop_back: () -> (),
+	
+	emplace: (Index: number, Constructor: (...any) -> T, ...any) -> T,
+	emplace_back: (Constructor: (...any) -> T, ...any) -> T,
+	emplace_front: (Constructor: (...any) -> T, ...any) -> T,
+
+	insert: (Index: number, Value: T) -> T,
+
+	erase: (Index: number) -> (),
+	erase_if: (Predicate: (T) -> boolean) -> (),
+	erase_range: (Begin: number, End: number) -> (), -- vector:erase_range(1, 4) results in indexes 1, 2 and 3 being erased, 4 is left and moved to the first index (if there were only 4 objects in the vector)
 	at: (Index: number) -> T, -- vector:at(3)
-	clear: () -> (), -- vector:clear()
-	empty: () -> boolean, -- vector:empty()
-	size: () -> number, -- vector:size()
-	iter: () -> () -> (number, T)?, -- for index, value in vector:iter()
-	find: (Value: T) -> number?, -- local index = vector:find(4)
-	contains: (Value: T) -> boolean, -- if vector:contains(4) then ...
-	find_if: (Predicate: (T) -> boolean) -> (number?, T?), -- local index, value = vector:find_if(function(v) return v == 4 end)
-	filter: (Predicate: (T) -> boolean) -> Vector<T>, -- local nofours = vector:filter(function(v) return v == 4 end)
-	sort: (Comparator: (T, T) -> boolean) -> (), -- vector:sort(function(v, v1) return v < v1 end)
-	erase_if: (Predicate: (T) -> boolean) -> (), -- vector:erase_if(function(v) return v ~= 4 end)
-	erase_range: (Begin: number, End: number) -> (), -- vector:erase_range(1, 4) -- erases 1,2,3
-	count: (Value: T) -> number, -- local fours = vector:count(4)
-	count_if: (Predicate: (T) -> boolean) -> number, -- local fours = vector:count_if(function(v) return v == 4 end)
-	reverse: () -> (), -- vector:reverse()
-	pop_front: () -> (), -- vector:pop_front()
-	pop_back: () -> (), -- vector:pop_front()
-	front: () -> T, -- local front = vector:front()
-	back: () -> T -- local back = vector:back()
+
+	clear: () -> (),
+	empty: () -> boolean,
+	size: () -> number,
+	count: (Value: T) -> number,
+	count_if: (Predicate: (T) -> boolean) -> number,
+
+	iter: () -> () -> (number, T)?,
+
+	find: (Value: T) -> number?,
+	find_if: (Predicate: (T) -> boolean) -> (number?, T?),
+	contains: (Value: T) -> boolean,
+
+	filter: (Predicate: (T) -> boolean) -> Vector<T>,
+	sort: (Comparator: (T, T) -> boolean) -> (),
+	reverse: () -> (),
 }
 
 local function AssertInBounds<T>(self: Vector<T>, Index: number, Extra: number?)
@@ -56,7 +65,7 @@ local function AssertInteger(Index: number)
 	end
 end
 
-local function Insert<T>(self: Vector<T>, Index: number, Value: T)
+local function Insert<T>(self: Vector<T>, Index: number, Value: T): T
 	local Size = self:size()
 
 	for index = Size, Index, -1 do
@@ -64,6 +73,7 @@ local function Insert<T>(self: Vector<T>, Index: number, Value: T)
 	end
 
 	self._Objects[Index] = Value
+	return self._Objects[Index]
 end
 
 function Vector:iter()
@@ -264,18 +274,18 @@ function Vector:erase(Index: number)
 	self._Objects[Size] = nil
 end
 
-function Vector.emplace<T>(self: Vector<T>, Index: number, Constructor: (...any) -> T, ...)
+function Vector.emplace<T>(self: Vector<T>, Index: number, Constructor: (...any) -> T, ...): T
 	AssertInteger(Index)
 	AssertInBounds(self, Index, 1)
-	Insert(self, Index, Constructor(...))
+	return Insert(self, Index, Constructor(...))
 end
 
-function Vector.emplace_back<T>(self: Vector<T>, Constructor: (...any) -> T, ...)
-	self:emplace(self:size() + 1, Constructor, ...)
+function Vector.emplace_back<T>(self: Vector<T>, Constructor: (...any) -> T, ...): T
+	return self:emplace(self:size() + 1, Constructor, ...)
 end
 
-function Vector.emplace_front<T>(self: Vector<T>, Constructor: (...any) -> T, ...)
-	self:emplace(1, Constructor, ...)
+function Vector.emplace_front<T>(self: Vector<T>, Constructor: (...any) -> T, ...): T
+	return self:emplace(1, Constructor, ...)
 end
 
 function Vector:reverse()
@@ -293,7 +303,7 @@ end
 function Vector.insert<T>(self: Vector<T>, Index: number, Value: T)
 	AssertInteger(Index)
 	AssertInBounds(self, Index, 1)
-	Insert(self, Index, Value)
+	return Insert(self, Index, Value)
 end
 
 function Vector:empty()
@@ -318,12 +328,14 @@ function Vector:pop_back()
 	self._Objects[self:size()] = nil
 end
 
-function Vector.push_back<T>(self: Vector<T>, Value: T)
-	self._Objects[self:size() + 1] = Value
+function Vector.push_back<T>(self: Vector<T>, Value: T): T
+	local Index = self:size() + 1
+	self._Objects[Index] = Value
+	return self._Objects[Index]
 end
 
-function Vector.push_front<T>(self: Vector<T>, Value: T)
-	self:insert(1, Value)
+function Vector.push_front<T>(self: Vector<T>, Value: T): T
+	return self:insert(1, Value)
 end
 
 function Vector:front()
@@ -346,5 +358,5 @@ function Vector.new<T>(...: T): Vector<T>
 	self._Objects = { ... }
 	return self
 end
-	
+
 return Vector
