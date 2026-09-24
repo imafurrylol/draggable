@@ -1,5 +1,6 @@
 https://create.roblox.com/store/asset/104156204331616
 <br>
+<br>
 Yet another Signal implementation, nothing special to offer.
 Requires my Vector ModuleScript:
 <br>
