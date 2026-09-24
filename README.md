@@ -11,3 +11,5 @@ https://github.com/imafurrylol/roblox/blob/main/Draggable/README.md
 https://github.com/imafurrylol/roblox/blob/main/GameSettings/README.md
 <br>
 https://github.com/imafurrylol/roblox/blob/main/Signal/README.md
+<br>
+https://github.com/imafurrylol/roblox/blob/main/Maid/README.md
