@@ -5,4 +5,5 @@ Yet another Signal implementation, nothing special to offer.
 <br>
 Requires my Vector ModuleScript:
 <br>
+<br>
 https://create.roblox.com/store/asset/81712460662745
