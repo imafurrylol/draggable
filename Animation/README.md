@@ -3,10 +3,8 @@ An alternative to TweenService.
 https://create.roblox.com/store/asset/74653002513678
 <br>
 <br>
-Requires my Vector ModuleScript:
+Requires:
 <br>
-https://create.roblox.com/store/asset/81712460662745
+https://create.roblox.com/store/asset/81712460662745 (Vector)
 <br>
-And my Signal ModuleScript:
-<br>
-https://create.roblox.com/store/asset/104156204331616
+https://create.roblox.com/store/asset/104156204331616 (Signal)
